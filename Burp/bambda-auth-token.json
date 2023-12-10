@@ -1,0 +1,26 @@
+if( !requestResponse.hasResponse() )
+{
+	return false;
+}
+
+if( requestResponse.request().hasHeader("Authorization") )
+{
+    if( requestResponse.request().headerValue("Authorization").startsWith("Bearer") )
+    {
+        String possible_token = requestResponse.request().headerValue("Authorization").split(" ")[1].trim();
+        
+        if( possible_token != null && possible_token.contains(".") ) 
+        {
+            String jwt_header = possible_token.split("\\.")[0];
+            if( jwt_header != null )
+            {
+                String decoded_header = utilities().base64Utils().decode(jwt_header).toString();
+                String algo = decoded_header.split("\"alg\":\"")[1];
+                if( algo.toUpperCase().startsWith("HS512") )
+                	return true;
+            }  
+        }
+    }
+}
+
+return false;
